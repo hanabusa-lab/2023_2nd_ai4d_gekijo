@@ -58,7 +58,6 @@ async function onStartButtonClick() {
     //let data = "p:" + index.toString(10) + '\n'
     //console.log("write volume", data);
     //await rcharacteristic.writeValue(new TextEncoder().encode(data))
-
   } catch (error) {
     console.log("Argh! " + error);
   }
@@ -78,7 +77,7 @@ async function handleNotifications(event) {
         var val = inputStr.slice(0, 1);
         let recieveData;
         if (val == "b") {
-          recieveData = inputStr.split(' ');
+          recieveData = inputStr.split(':');
           console.log(recieveData);
           console.log(recieveData[0]);
           console.log('ボタン種別: ' + recieveData[1]);
@@ -119,7 +118,7 @@ async function handleNotifications(event) {
   kind コマンド種類(p:ページ、v:振動, l:led, s:音)
   val 値
 */
-async function onSendCmd(kind, val) {
+async function sendCmd(kind, val) {
   try {
     // console.log("len=", gRXCharaList.length);
     if (gRXCharaList.length == 0) {
@@ -141,8 +140,8 @@ async function onSendCmd(kind, val) {
         if (element["service"]["device"]["name"] != dname) {
           continue;
         }
-        let data = kind + val.toString(10) + '\n'
-        // console.log("write volume", data);  
+        let data = kind +":"+ val.toString(10) + '\n'
+        console.log("write cmd", kind, val);  
         await element.writeValue(new TextEncoder().encode(data))
         }
     }

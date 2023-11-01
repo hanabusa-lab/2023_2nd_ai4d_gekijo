@@ -199,13 +199,9 @@ function keyPressed() {
     }
   }
    
-  if (key == "v") {
-    console.log("send vol");
-    for (player of gPlayerList) {
-      for (elem of player.gakkis) {
-        onSendVolume(elem, 255)
-      }
-    }
+  if (key == "p") {
+    console.log("send p");
+    sendCmd("p", 1);
   }
 }
 
