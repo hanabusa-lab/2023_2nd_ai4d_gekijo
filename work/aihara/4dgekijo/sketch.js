@@ -198,84 +198,22 @@ function keyPressed() {
       }
     }
   }
-   
+  
+  //micro:bit通信テスト用
   if (key == "p") {
     console.log("send p");
-    sendCmd("p", 1);
+    //sendCmd("", "p", 0);
+    for (const player of gPlayerList) {
+      sendCmd(player.devname, "p", 2);  
+    }
   }
 }
-
 
 function mouseClicked() {
 
   console.log("mouseCliced");
 
 }
-
-//プレイヤーの現在の色を使って、playerが利用する楽器を行進する。
-function updateGakkiofPlayer(player) {
-  //楽器リストの中で、プレイヤーの色に一番近い楽器を取得する。
-  //一応、該当する色がなかったら、追加しない。
-  var hued = 999; //色相の差分
-  var hurc = getHue(player.color);
-  var gakki = null;
-  var hue = 0;
-
-  for (let elem of gGakkiList) {
-    for (let color of elem.colors) {
-      hue = getHue(color)
-      if (Math.abs(hurc - hue) < hued) {
-        hued = Math.abs(hurc - hue);
-        gakki = elem;
-      }
-    }
-  }
-
-  //色差分が遠かった場合には、楽器を更新しない。
-  if (hued > 100) {
-    return;
-  }
-  // player.updateGakki(gakki.kind);
-}
-
-
-//現在のプレーヤーの状態で音を変える。
-function cntrlSoundByPlayer() {
-  //現在のプレーヤーが担当している音のみを再生する。
-  let isGakkiPlaying = 0;
-
-  if (isClicked == true) {
-    for (let gakki of gGakkiList) {
-      if (gakki.sound.isPlaying()) {
-        isGakkiPlaying = 1;
-        gCoolCount = 0;
-        break;
-      }
-    }
-    if (isGakkiPlaying == 0) {
-      gCoolCount = gCoolCount + 1;
-      // console.log("gCoolCount", gCoolCount);
-      if (gCoolCount > 50) {
-        // console.log("sound start ", millis());
-        for (let gakki of gGakkiList) {
-          gakki.sound.play();
-          // console.log("gakki play ", gakki,  millis());
-        }
-        //  console.log("sound end", millis());
-      }
-    }
-    for (let gakki of gGakkiList) {
-      if (gakki.colorMatched == true) {
-        gakki.sound.setVolume(1);
-      } else {
-        gakki.sound.setVolume(0);
-      }
-
-    }
-
-  }
-}
-
 
 function isMousePosRange(position, range) {
   if ((mouseX >= (position[0] - range[0] * 0)) && (mouseX <= (position[0] + range[0]))) {
@@ -284,52 +222,4 @@ function isMousePosRange(position, range) {
     }
   }
   return false;
-
-}
-
-
-function calcAmpOfPlayers() {
-  let amp = [];
-  let ampPlayers = [0, 0, 0, 0];
-  for (let player of gPlayerList) {
-    amp = 0;
-
-    let i = 0;
-    for (let gakki of gGakkiList) {
-      // if (player.gakkis.indexOf(gakki.kind) != -1) {
-      if (i < 2) {
-        let gain = 1;
-        ampPlayers[3] = ampPlayers[3] + gakki.ampAnalyer.getLevel() * 255 * gain;
-        ampPlayers[3] = Math.min(ampPlayers[3], 254);
-        ampPlayers[3] = Math.max(ampPlayers[3], 0);
-        ampPlayers[3] = Math.trunc(ampPlayers[3]);
-      } else if (i < 4) {
-        let gain = 1;
-        ampPlayers[0] = ampPlayers[0] + gakki.ampAnalyer.getLevel() * 255 * gain;
-        ampPlayers[0] = Math.min(ampPlayers[0], 254);
-        ampPlayers[0] = Math.max(ampPlayers[0], 0);
-        ampPlayers[0] = Math.trunc(ampPlayers[0]);
-      } else if (i < 6) {
-        let gain = 1;
-        ampPlayers[1] = ampPlayers[1] + gakki.ampAnalyer.getLevel() * 255 * gain;
-        ampPlayers[1] = Math.min(ampPlayers[1], 254);
-        ampPlayers[1] = Math.max(ampPlayers[1], 0);
-        ampPlayers[1] = Math.trunc(ampPlayers[1]);
-      } else if (i < 8) {
-        let gain = 1;
-        ampPlayers[2] = ampPlayers[2] + gakki.ampAnalyer.getLevel() * 255 * gain;
-        ampPlayers[2] = Math.min(ampPlayers[2], 254);
-        ampPlayers[2] = Math.max(ampPlayers[2], 0);
-        ampPlayers[2] = Math.trunc(ampPlayers[2]);
-      }
-      i = i + 1;
-    }
-    if (amp == 0) {
-      amp = 200;
-    }
-    ampPlayers.push(amp);
-  }
-  // console.log("ampPlayers: " + ampPlayers);
-  return ampPlayers;
-
 }

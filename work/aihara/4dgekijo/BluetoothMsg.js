@@ -2,10 +2,10 @@
 const UUID_UART_SERVICE = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 const UUID_TX_CHAR_CHARACTERISTIC = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
 const UUID_RX_CHAR_CHARACTERISTIC = '6e400003-b5a3-f393-e0a9-e50e24dcca9e'
-let gTXCharaList = [];
-var gRXCharaList = [];
+//let gTXCharaList = []; bluetooth接続ごとに更新されるためplayerの属性に追加
+//var gRXCharaList = []; bluetooth接続ごとに更新されるためplayerの属性に追加
 //デバイスと音のパートの関連付
-var gPartList = [];
+//var gPartList = [];
 
 async function onStartButtonClick() {
   try {
@@ -27,37 +27,37 @@ async function onStartButtonClick() {
     tcharacteristic.addEventListener("characteristicvaluechanged", handleNotifications);
     console.log("Notifications started");
     //送信サービスリストに追加
-    gTXCharaList.push(tcharacteristic);
+    //gTXCharaList.push(tcharacteristic);
 
     rcharacteristic = await service.getCharacteristic(UUID_RX_CHAR_CHARACTERISTIC);
     console.log("rcharacteristic", rcharacteristic);
 
     //受信サービスに追加
-    gRXCharaList.push(rcharacteristic);
-
+    //gRXCharaList.push(rcharacteristic);
     //接続した時点でプレイヤーリストに追加する。
     devname = device["name"];
     console.log("device=", devname)
 
-    //プレーヤーリストの確認を行う
-    let findFg = false;
-    let player = null;
-    for (p of gPlayerList) {
-      if (p.devname == devname) {
-        findFg = true;
-        break;
-      }
-    }
-    //プレーヤーがいない場合には、追加する。
-    if (!findFg) {
-      player = new Player();
-      player.devname = devname;
-      gPlayerList.push(player);
-    }
-    //let index = gPlayerList.indexOf(player);
-    //let data = "p:" + index.toString(10) + '\n'
-    //console.log("write volume", data);
-    //await rcharacteristic.writeValue(new TextEncoder().encode(data))
+    //プレーヤーが既に存在している場合には一旦削除する。
+    //bluetooth再接続をするとrcharasticやtcharasticというbluetoothサービス名称が更新されるため
+    gPlayerList.forEach((player, index) => {
+        if(player.devname==devname){
+          gPlayerList.splice(index, 1)
+        }
+    });
+
+    //プレイヤーを追加する。
+    player = new Player();
+    player.devname = devname;
+    player.rxchara = rcharacteristic;
+    player.txchara = tcharacteristic;
+    gPlayerList.push(player);
+    
+    //プレイヤーを表示する
+    gPlayerList.forEach((player, index) => {
+      console.log("index:",index,"player:",player.devname);
+    });
+    console.log()
   } catch (error) {
     console.log("Argh! " + error);
   }
@@ -66,9 +66,7 @@ async function onStartButtonClick() {
 //bluetooth通知を受け取った場合
 async function handleNotifications(event) {
   try {
-    if (gTXCharaList.length == 0) {
-      return;
-    }
+    //入力確認
     const value = event.target.value;
     const inputValue = new TextDecoder().decode(value).replace(/\r?\n/g, '');
     switch (inputValue) {
@@ -84,30 +82,8 @@ async function handleNotifications(event) {
           
           console.log("event=", event)
           devname = event["srcElement"]["service"]["device"]["name"];
-          console.log("device=", devname)
-
-          //プレーヤーリストの確認を行う
-          let findFg = false;
-          let player = null;
-          for (p of gPlayerList) {
-            if (p.devname == devname) {
-              //p.color = [recieveData[1],recieveData[2],recieveData[3]];
-              player = p;
-              findFg = true;
-              break;
-            }
-          }
-          //プレーヤーがいない場合には、追加する。
-          if (!findFg) {
-            player = new Player();
-            gPlayerList.push(player);
-          }
-
-          player.setDevame(devname);
-          player.color = [recieveData[1], recieveData[2], recieveData[3]];
-          //プレイヤーの楽器を更新する。
-          // updateGakkiofPlayer(player);         
-        }
+          console.log("device=", devname)     
+      }
     }
   } catch (error) {
     console.log("Argh! " + error);
@@ -115,35 +91,23 @@ async function handleNotifications(event) {
 }
 
 /* micro:bitに対してコマンドを送信する
+  devname　プレイヤーの名称(""が指定されている場合には接続している全員に送信する)
   kind コマンド種類(p:ページ、v:振動, l:led, s:音)
   val 値
 */
-async function sendCmd(kind, val) {
+async function sendCmd(devname, kind, val) {
   try {
-    // console.log("len=", gRXCharaList.length);
-    if (gRXCharaList.length == 0) {
-      return;
-    }
-
     //接続しているplayserを特定して対応するデバイス名称を取得する。
     //複数のデバイスに対応すること。
-    var chara = null;
-    dname = "";
-    // console.log("playerlist=",gPlayerList);
+    pname = "";
     for (const player of gPlayerList) {
       // console.log("elem=",player.devname);
-      dname = player.devname;
-
-      //該当デバイスに対してvolを送付する。
-      for (const element of gRXCharaList) {
-        //該当のデバイスのみ送付する。
-        if (element["service"]["device"]["name"] != dname) {
-          continue;
-        }
+      pname = player.devname;
+      if(devname=="" || devname==pname){
         let data = kind +":"+ val.toString(10) + '\n'
         console.log("write cmd", kind, val);  
-        await element.writeValue(new TextEncoder().encode(data))
-        }
+        await player.rxchara.writeValue(new TextEncoder().encode(data))
+      }
     }
   } catch (error) {
     console.log("Argh! " + error);
