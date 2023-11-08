@@ -1,106 +1,15 @@
-//let KYOKU = 'BELL';
-// let KYOKU = 'CHAIRO';
-// let KYOKU = 'SEIJA';
- let KYOKU = 'HOSHI';
 
-// let ONSHITSU = 'NORMAL'; // 通常音質
-// let ONSHITSU = 'LIGHT'; // 処理落ちするとき用の音質
-
-let gCoolCount = 0;
-
-
-let gCanvasSize = [1600, 1200]; //キャンバスサイズ
+let gCanvasSize = [1600, 1200]; //全体のキャンバスサイズ
+let gTextCanvasSize =[600, 600]; //テキストのキャンバスサイズ
+let gImgCanvasSize =[600, 600]; //画像のキャンバスサイズ
 
 let gPlayerList = [];//プレイヤーのリスト
-let gGakkiList = [];//楽器のリスト
-let gOverlayimgList = [];
 
-let gUiImgList = [];// UIイメージオブジェクトを格納するリスト
-let gIconImgList = [];// UIイメージオブジェクトを格納するリスト
-let gOtherImgList = [];
-
-let gColorCheckActive = false;
-
-let PAGE_MAX = 1; //ページの最大数
+let PAGE_MAX = 2; //ページの最大数
 let gPageList = []; //ページごとのオブジェクトを格納するリスト
 let gPageIndex = 1; //表示するページ番号
 
-let imgTest;
-let song;
-
 let isClicked = false;
-
-//楽器種別
-const Gakki_Kind = {
-  None: 0, Piano: 1, Metallophone0: 2, Saxophone: 3, Triangle0: 4,
-  Tambourine0: 5, Drum0: 6, Trumpet0: 7, Trombone0: 8, Violin0: 9, Drumset: 10, Hihat: 11,
-  Keyboard: 12, Cello: 13, Base: 14, Clarinet: 15, Cymbal: 16, Guitar: 17, Harp: 18, Horn: 19,
-  Mokkin: 20, Tekkin: 21, Tuba: 22, Flote: 23, Timpani: 24, Synthesizer: 25, Tubularbell: 26, Windchime: 27
-};
-
-const GAKKI_SET = [
-  { "imgDirectory": ["assets/Gakki/drum_gray.png", "assets/Gakki/drum.png"], "gakki": Gakki_Kind.Drum0 },
-  { "imgDirectory": ["assets/Gakki/drumset_gray.png", "assets/Gakki/drumset.png"], "gakki": Gakki_Kind.Drumset }
-]
-
-const UI_IMG_SET = ['assets/UI/red.png', 'assets/UI/green.png', 'assets/UI/blue.png', 'assets/UI/empty.png', 'assets/UI/dodai.png']
-const ICON_IMG_SET = ['assets/UI/player0.png', 'assets/UI/player1.png', 'assets/UI/player2.png', 'assets/UI/player3.png']
-const OTHER_IMG_SET = ['assets/backimg.png', 'assets/backimg_merry.png']
-
-//曲のセットを行進する
-function updateSoundSet(sound_set) {
-  gGakkiList = [];
-
-  for (elem of sound_set) {
-    gakki = new Gakki();
-    gakki.setKind(elem["gakki"]);
-    for (color of elem["color"]) {
-      gakki.addColor(color);
-    }
-    gakki.setSoundName(elem["sound"]);
-    gakki.setPos(elem["pos"]);
-    gakki.setColorMatched(elem["colorMatched"])
-    for (gakki_set of GAKKI_SET) {
-      if (elem["gakki"] == gakki_set["gakki"]) {
-        gakki.setImgDir(gakki_set["imgDirectory"])
-        break;
-      }
-    }
-    // gakki.setImgDir(elem["imgDirectory"])
-    gakki.setImg();
-    gGakkiList.push(gakki);
-  }
-}
-
-function updatePlayerSet(player_set) {
-  let i = 0;
-  let playerSet = [];
-  for (p of gPlayerList) {
-    playerSet = player_set[i];
-    p.updateGakki(playerSet["gakkis"])
-    p.setPos([275 + i * 300, 630]);
-    i = i + 1;
-    i = Math.min(i, 3);
-  }
-
-}
-
-//被せる装飾イメージをセットする
-function updateOverlayimgSet(img_set) {
-  gOverlayimgList = [];
-
-  for (elem of img_set) {
-    img = new Overlayimg();
-    for (color of elem["color"]) {
-      img.addColor(color);
-    }
-    img.setPos(elem["pos"]);
-    img.setColorMatched(elem["colorMatched"])
-    img.setImgDir(elem["imgDirectory"])
-    img.setImg();
-    gOverlayimgList.push(img);
-  }
-}
 
 //画像を取得する
 //page_no:取得するページの番号 1〜
@@ -115,8 +24,8 @@ function getImg(page_no){
 function getText(page_no){
   //asset/page_noに画像があることとする。
   //フォルダの確認
-  //txt =  loadStrings("assets/"+page_no+"/"+page_no+".txt");
-  txt =  loadStrings("assets/1/1.txt");
+  txt =  loadStrings("assets/"+page_no+"/"+page_no+".txt");
+  //txt =  loadStrings("assets/1/1.txt");
   //console.log(txt)
   
   return txt;
@@ -160,62 +69,63 @@ function preload() {
 //画面関連の初期化
 function setup() {
   createCanvas(gCanvasSize[0], gCanvasSize[1]);
-  //楽曲を読み込む
-  /*for (let elem of gGakkiList) {
-    elem.loadSound();
-  }*/
+
+  //前ボタン
+  let preButton = createButton('前');
+  preButton.position(150, 800); // ボタンの位置を指定
+  preButton.style('width', '100px');
+  preButton.style('height', '50px');
+  preButton.style('font-family', 'Arial'); // フォントファミリーをArialに設定
+  preButton.style('font-size', '40px'); // フォントサイズを20pxに設定
+  preButton.mousePressed(() => {
+    if(1<gPageIndex){
+      gPageIndex--;
+      console.log("page=", gPageIndex);
+    }
+  });
+
+   //次ボタン
+   let nextButton = createButton('次');
+   nextButton.position(300, 800); // ボタンの位置を指定
+   nextButton.style('width', '100px');
+   nextButton.style('height', '50px');
+   nextButton.style('font-family', 'Arial'); // フォントファミリーをArialに設定
+   nextButton.style('font-size', '40px'); // フォントサイズを20pxに設定
+   nextButton.mousePressed(() => {
+    if(gPageIndex<PAGE_MAX){
+      gPageIndex++;
+      console.log("page=", gPageIndex);
+    }  
+  }); 
 }
 
 //描画処理
 function draw() {
-
   background(240, 240, 200);
-  //image(gOtherImgList[0], 0, 0, gOtherImgList[0].width, gOtherImgList[0].height);
-  //image(gOtherImgList[1], 0, 0, gOtherImgList[1].width / 6, gOtherImgList[1].height / 6);
+  
+  let tPage = gPageList[gPageIndex-1];
+  //現在のページの表示
+  textAlign(LEFT);
+  textSize(20);
+  text("page="+gPageIndex, 100, 100); 
 
   //文章の表示
-  tPage = gPageList[gPageIndex-1];
-  //console.log("show text. index=", gPageIndex);
-  tText = tPage.text;
-  console.log("tmpTxt=", tText);
+  let tText = tPage.text;
+  //console.log("tmpTxt=", tText);
+  textAlign(LEFT);
+  textSize(20);
+  let textPos = [100, 200]; 
+  //let textBoxSize = [gCanvasSize[0]/2-100, ]
+  //テキストをテキストキャンバスで描画する
+  let joinedText = tText.join("\n");
+  text(joinedText, textPos[0], textPos[1], gTextCanvasSize[0], gTextCanvasSize[1]); 
   
-  textAlign(CENTER);
-  tSize = 20;
-  textSize(tSize);
-  let textPos = [100, 200]; //txtの表示開始ポジション
- 
-  for (let i = 0; i < tText.length; i++) {
-    if(tText[i]=="") continue;
-    console.log("text=",tText[i]);
-    text(tText[i], textPos[0], textPos[1]+i*tSize); 
+  //画像の表示
+  let tImg = tPage.image;
+  let imgPos = [gCanvasSize[0]/2, 200]; //imageの表示開始ポジション
+  if(tImg!=null){
+    image(tImg, imgPos[0], imgPos[1], tImg.width, tImg.height);
   }
-
-  //現在のプレーヤーの状態で音を変える。
-
-  /*
-  let volumes = [100, 100, 100, 100];
-  if (gColorCheckActive == true) {
-    cntrlSoundByPlayer();
-
-    dispParamDebug();
-
-    let volGain = 0;
-    if (second() % 2 == 0) {
-      volGain = 255;
-    }
-
-    volumes = calcAmpOfPlayers();
-    dispGakkiStatus(volumes);
-    dispOverlayimgStatus();
-
-  }
-  onSendVolume("", volumes);
-  dispCurrentPlayerColor(volumes);
-  if (countBackImg > 11) {
-    image(gOtherImgList[1], 0, 0, gOtherImgList[1].width, gOtherImgList[1].height);
-  }
-  */
-
 }
 
 function keyPressed() {
@@ -242,9 +152,7 @@ function keyPressed() {
 }
 
 function mouseClicked() {
-
   console.log("mouseCliced");
-
 }
 
 function isMousePosRange(position, range) {
