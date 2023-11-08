@@ -21,13 +21,14 @@ let gOtherImgList = [];
 
 let gColorCheckActive = false;
 
+let PAGE_MAX = 1; //ページの最大数
+let gPageList = []; //ページごとのオブジェクトを格納するリスト
+let gPageIndex = 1; //表示するページ番号
 
 let imgTest;
 let song;
 
 let isClicked = false;
-
-
 
 //楽器種別
 const Gakki_Kind = {
@@ -84,7 +85,6 @@ function updatePlayerSet(player_set) {
 
 }
 
-
 //被せる装飾イメージをセットする
 function updateOverlayimgSet(img_set) {
   gOverlayimgList = [];
@@ -102,28 +102,58 @@ function updateOverlayimgSet(img_set) {
   }
 }
 
+//画像を取得する
+//page_no:取得するページの番号 1〜
+function getImg(page_no){
+  //asset/page_noに画像があることとする。
+  img = loadImage("assets/"+page_no+"/"+page_no+".png");
+  return img; 
+}
+
+//テキストを取得する
+//page_no:取得するページの番号 1〜
+function getText(page_no){
+  //asset/page_noに画像があることとする。
+  //フォルダの確認
+  //txt =  loadStrings("assets/"+page_no+"/"+page_no+".txt");
+  txt =  loadStrings("assets/1/1.txt");
+  //console.log(txt)
+  
+  return txt;
+}
+
+//データの読み込みを行う
+function loadContents(){
+  for(let i=1; i<=PAGE_MAX; i++){
+    let page = new Page();
+    //画像の読み込み
+    img = getImg(i);
+    if(img!=null){
+      page.image = img;
+    }else{
+      console.log("img load error. page=",i);
+    }
+
+    //テキストの読み込み
+    let txt = getText(i);
+  
+    if(txt!=null){
+      page.text = txt;
+      console.log("text=",page.text);
+    }else{
+      console.log("text load error. page=",i);
+    }
+    gPageList.push(page);
+  }
+}
+
 //アセットの読み込み、各種情報の初期化
 function preload() {
 
-  // Ensure the .ttf or .otf font stored in the assets directory
-  // is loaded before setup() and draw() are called
+  //コンテンツの読み込み
+  loadContents();
 
-  /*updateOverlayimgSet(OVERLAYIMG_SET);
-  for (let imgUiDir of UI_IMG_SET) {
-    let imgUi = loadImage(imgUiDir);
-    gUiImgList.push(imgUi);
-  }
-
-  for (let icon of ICON_IMG_SET) {
-    let imgIcon = loadImage(icon);
-    gIconImgList.push(imgIcon);
-  }
-
-  for (let other of OTHER_IMG_SET) {
-    let imgOther = loadImage(other);
-    gOtherImgList.push(imgOther);
-  }
-  */
+  //フレームレートの設定
   frameRate(15);
 }
 
@@ -131,32 +161,34 @@ function preload() {
 function setup() {
   createCanvas(gCanvasSize[0], gCanvasSize[1]);
   //楽曲を読み込む
-  for (let elem of gGakkiList) {
+  /*for (let elem of gGakkiList) {
     elem.loadSound();
-  }
+  }*/
 }
 
 //描画処理
 function draw() {
 
-  // background(240, 240, 200);
+  background(240, 240, 200);
   //image(gOtherImgList[0], 0, 0, gOtherImgList[0].width, gOtherImgList[0].height);
-  // image(gOtherImgList[1], 0, 0, gOtherImgList[1].width / 6, gOtherImgList[1].height / 6);
+  //image(gOtherImgList[1], 0, 0, gOtherImgList[1].width / 6, gOtherImgList[1].height / 6);
 
-  let countBackImg = 0;
-  for (let gakki of gGakkiList) {
-    if (gakki.colorMatched == true) {
-      countBackImg = countBackImg + 1;
-    }
+  //文章の表示
+  tPage = gPageList[gPageIndex-1];
+  //console.log("show text. index=", gPageIndex);
+  tText = tPage.text;
+  console.log("tmpTxt=", tText);
+  
+  textAlign(CENTER);
+  tSize = 20;
+  textSize(tSize);
+  let textPos = [100, 200]; //txtの表示開始ポジション
+ 
+  for (let i = 0; i < tText.length; i++) {
+    if(tText[i]=="") continue;
+    console.log("text=",tText[i]);
+    text(tText[i], textPos[0], textPos[1]+i*tSize); 
   }
-  for (let overimg of gOverlayimgList) {
-    if (overimg.colorMatched == true) {
-      countBackImg = countBackImg + 1;
-    }
-  }
-
-  fill(255);
-  textSize(20);
 
   //現在のプレーヤーの状態で音を変える。
 
