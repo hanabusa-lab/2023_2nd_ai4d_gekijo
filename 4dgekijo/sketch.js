@@ -61,6 +61,8 @@ function draw() {
         gPageIndex = (gPageIndex + 1) % PAGE_MAX; 
         updateTextAndImage();
         buttonB = 0;
+        //Send bluetooth message only forward move
+        sendCmd("", "p", gPageIndex);
     } else if (buttonA === 1) {
         // Move to the previous comic panel
         gPageIndex = (gPageIndex - 1 + PAGE_MAX) % PAGE_MAX; 
@@ -75,6 +77,8 @@ function keyPressed() {
         // Move to the next comic panel
         gPageIndex = (gPageIndex + 1) % PAGE_MAX; 
         updateTextAndImage();
+         //Send bluetooth message only forward move
+        sendCmd("", "p", gPageIndex);
     } else if (keyCode === LEFT_ARROW) {
         // Move to the previous comic panel
         gPageIndex = (gPageIndex - 1 + PAGE_MAX) % PAGE_MAX; 
