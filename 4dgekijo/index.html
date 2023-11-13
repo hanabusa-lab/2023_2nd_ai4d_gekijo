@@ -2,25 +2,65 @@
 <html lang="en">
 
 <head>
-  <script src="js/p5.js"></script>
-  <script src="js/p5.sound.min.js"></script>
-  <script src="js/p5.speech.js"></script>
+  <script src="p5.js"></script>
+  <script src="p5.sound.min.js"></script>
+  <script src="p5.speech.js"></script>
   <link rel="stylesheet" type="text/css" href="style.css">
   <meta charset="utf-8">
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AI 4D劇場</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.css" />
+  
+  <style>
+    #drop_zone {
+            border: 2px dashed #ccc;
+            width: 1600px;
+            height: 900px;
+            text-align: center;
+            padding: 50px;
+            position: absolute; /* Use absolute positioning */
+            top: 0px; /* Adjust the top position as needed */
+            left: 0px; /* Adjust the left position as needed */
+            z-index: 10; /* Ensure it overlaps other elements */
+        }
+      /* Styles for the text input and download button */
+      #textInput, #downloadButton {
+            position: absolute; /* Use absolute positioning */
+            z-index: 11; /* Ensure they overlap other elements */
+        }
+
+        /* Position the text input */
+        #textInput {
+            top: 600px; /* Adjust the top position as needed */
+            left: 1000px; /* Adjust the left position as needed */
+        }
+
+        /* Position the download button */
+        #downloadButton {
+            top: 630px; /* Adjust the top position as needed */
+            left: 1000px; /* Adjust the left position as needed */
+        }
+  </style>
+  
+  
 </head>
 
 <body>
-  <script src="js/Player.js"></script>
-  <script src="js/BluetoothMsg.js"></script>
-  <script src="js/Page.js"></script>
-  <script src="js/sketch.js"></script>
-  <section class="section">
+  <input type="text" id="textInput" placeholder="Enter text here">
+  <button id="downloadButton" onclick="saveText()">Download Text</button>
+
+  
+  <script src="Player.js"></script>
+  <script src="BluetoothMsg.js"></script>
+  <script src="Page.js"></script>
+  <script src="sketch.js"></script>
+  <section class="section" style="position: absolute; top: 550px; left: 1150px; z-index: 12;">
     <button class="button is-success is-light" type="button" onclick="onStartButtonClick()">マイクロビットせつぞく</button>
   </section>
+  
+  
+  <div id="drop_zone"></div>
 </body>
 
 </html>

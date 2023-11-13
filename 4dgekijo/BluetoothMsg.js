@@ -74,6 +74,7 @@ async function handleNotifications(event) {
         inputStr = inputValue;
         var val = inputStr.slice(0, 1);
         let recieveData;
+        isBluetoothDataRecieved = 1;
         if (val == "b") {
           recieveData = inputStr.split(':');
           console.log(recieveData);
@@ -82,7 +83,16 @@ async function handleNotifications(event) {
           
           console.log("event=", event)
           devname = event["srcElement"]["service"]["device"]["name"];
-          console.log("device=", devname)     
+          console.log("device=", devname)
+          
+          
+          if(recieveData[1] == 1){
+            buttonA = 1;
+          }
+          if(recieveData[1] == 2){
+            buttonB = 1;
+          }
+          
       }
     }
   } catch (error) {
