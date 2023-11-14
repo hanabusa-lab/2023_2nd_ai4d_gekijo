@@ -173,7 +173,7 @@ function saveImage(dataURL, filename) {
 
 function saveText() {
   let text = document.getElementById('textInput').value;
-  let filename = 'desiredTextFileName.txt';
+  let filename = str(gPageIndex)+'.txt';
   
   let blob = new Blob([text], { type: 'text/plain' });
   let url = window.URL.createObjectURL(blob);
