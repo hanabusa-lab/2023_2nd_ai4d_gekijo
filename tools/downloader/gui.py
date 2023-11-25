@@ -108,7 +108,7 @@ api_key_index = 0
 large_font = ('Meiryo', 12)  # Example font and size
 
 # User input with increased size and font
-text_input = tk.Entry(root, width=50, font=large_font)  # Adjust the width as needed
+text_input = tk.Entry(root, width=20, font=large_font)  # Adjust the width as needed
 text_input.pack(side=tk.LEFT, padx=1, pady=1)  # Added padding for better layout
 
 # Download button with increased size and font
