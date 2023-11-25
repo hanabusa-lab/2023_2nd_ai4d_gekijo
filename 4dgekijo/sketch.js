@@ -67,6 +67,7 @@ function draw() {
         // Move to the previous comic panel
         gPageIndex = (gPageIndex - 1 + PAGE_MAX) % PAGE_MAX; 
         updateTextAndImage();
+        sendCmd("", "p", gPageIndex);
         buttonA = 0;
     }
 }
@@ -82,6 +83,7 @@ function keyPressed() {
     } else if (keyCode === LEFT_ARROW) {
         // Move to the previous comic panel
         gPageIndex = (gPageIndex - 1 + PAGE_MAX) % PAGE_MAX; 
+        sendCmd("", "p", gPageIndex);
         updateTextAndImage();
     }
 }
