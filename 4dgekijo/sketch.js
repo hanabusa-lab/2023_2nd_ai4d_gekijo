@@ -94,8 +94,8 @@ function updateTextAndImage() {
     let currentPage = gPageList[gPageIndex]; // Get current page
     let tText = currentPage.text.join('\n'); // Join text with line breaks
     let textPos = [920, 100]; // Text display start position
-    let textBoxWidth = 600; // Width of the text box
-    let tSize = 40; // Text size
+    let textBoxWidth = 300; // Width of the text box
+    let tSize = 30; // Text size
 
     // Draw text box and image
     drawTextBox(tText, textPos[0], textPos[1], textBoxWidth, tSize);
