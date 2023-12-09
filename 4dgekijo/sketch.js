@@ -100,6 +100,7 @@ function updateTextAndImage() {
     // Draw text box and image
     drawTextBox(tText, textPos[0], textPos[1], textBoxWidth, tSize);
     image(currentPage.image, 0, 0, 900, 900);
+    text(str(gPageIndex + 1) + "コマ目：", textPos[0], textPos[1] - 40)
 }
 
 // Function to draw a text box with word wrapping
