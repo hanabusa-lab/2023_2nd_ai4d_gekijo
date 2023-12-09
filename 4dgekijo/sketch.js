@@ -190,4 +190,6 @@ function saveText() {
   document.body.removeChild(link);
 
   window.URL.revokeObjectURL(url);
+
+  document.getElementById('textInput').value = '';
 }
