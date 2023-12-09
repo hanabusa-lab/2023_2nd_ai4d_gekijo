@@ -9,6 +9,7 @@ import webbrowser
 import os
 import urllib.request
 import time
+import threading
 
 
 def on_right_click(event):
@@ -40,7 +41,7 @@ def download_image():
     global api_key_index
     api_key = api_keys[api_key_index]
     error_label.config(text="", fg="red")
-    user_input = text_input.get()
+    user_input = text_input.get("1.0", "end-1c")  # Get text from tk.Text widget
     current_time = datetime.datetime.now().strftime("%H_%M_%S")
     
     if (user_input == 'api0'):
@@ -82,12 +83,12 @@ def download_image():
         # Show the result that has been pushed to an url
         # webbrowser.open(response.data[0].url)
         urllib.request.urlretrieve(response.data[0].url, "マンガ_" + str(current_time) +".jpg")
-        text_input.delete(0, tk.END)  # Clear the text input
+        text_input.delete("1.0", tk.END)  # Clear the text input for tk.Text
         error_label.config(text="ダウンロードをおしたら１分くらいまってね！", fg="blue")
         
     
     except Exception as e:
-        error_label.config(text="エラー！せんせいをよんでね！", fg="red")
+        error_label.config(text="エラー！もういちどダウンロードをおしてね！", fg="red")
     
     # text_input.delete(0, tk.END)  # Clear the text input
 
@@ -107,9 +108,9 @@ api_key_index = 0
 # Larger font for widgets
 large_font = ('Meiryo', 12)  # Example font and size
 
-# User input with increased size and font
-text_input = tk.Entry(root, width=20, font=large_font)  # Adjust the width as needed
-text_input.pack(side=tk.LEFT, padx=1, pady=1)  # Added padding for better layout
+# User input with increased size, font, and word wrap
+text_input = tk.Text(root, height=4, width=20, font=large_font, wrap=tk.WORD)
+text_input.pack(side=tk.LEFT, padx=1, pady=1)
 
 # Download button with increased size and font
 download_button = tk.Button(root, text="ダウンロード", command=download_image, font=large_font, height=2, width=20)  # Adjust height and width as needed
